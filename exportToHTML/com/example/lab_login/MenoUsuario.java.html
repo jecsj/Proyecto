@@ -1,0 +1,179 @@
+<html>
+<head>
+<title>MenoUsuario.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6897bb;}
+.s3 { color: #6a8759;}
+.s4 { color: #808080;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+MenoUsuario.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">com.example.lab_login</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.Manifest</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.content.Context</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.content.Intent</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.content.pm.PackageManager</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.location.Address</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.location.Geocoder</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.location.Location</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.location.LocationListener</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.location.LocationManager</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.location.LocationProvider</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.provider.Settings</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.os.Bundle</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.util.Log</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.view.View</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.widget.Button</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.widget.TextView</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">android.widget.Toast</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">java.io.IOException</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.util.List</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.util.Locale</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">androidx.appcompat.app.AppCompatActivity</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">androidx.core.app.ActivityCompat</span><span class="s0">;</span>
+
+<span class="s0">public class </span><span class="s1">MenoUsuario </span><span class="s0">extends </span><span class="s1">AppCompatActivity {</span>
+
+    <span class="s1">TextView tDireccion</span><span class="s0">;</span>
+    <span class="s1">Button bGuardar</span><span class="s0">,</span><span class="s1">blistar</span><span class="s0">;</span>
+    <span class="s1">LoginDatabaseHelper miBD</span><span class="s0">;</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">protected void </span><span class="s1">onCreate(Bundle savedInstanceState) {</span>
+        <span class="s0">super</span><span class="s1">.onCreate(savedInstanceState)</span><span class="s0">;</span>
+        <span class="s1">setContentView(R.layout.activity_meno_usuario)</span><span class="s0">;</span>
+        <span class="s1">tDireccion = (TextView) findViewById(R.id.txtDireccion)</span><span class="s0">;</span>
+        <span class="s1">bGuardar =(Button)findViewById(R.id.btnGuardar)</span><span class="s0">;</span>
+
+        <span class="s1">miBD = </span><span class="s0">new </span><span class="s1">LoginDatabaseHelper(</span><span class="s0">this</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s0">if </span><span class="s1">(ActivityCompat.checkSelfPermission(</span><span class="s0">this, </span><span class="s1">Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &amp;&amp; ActivityCompat.checkSelfPermission(</span><span class="s0">this, </span><span class="s1">Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {</span>
+            <span class="s1">ActivityCompat.requestPermissions(</span><span class="s0">this, new </span><span class="s1">String[]{Manifest.permission.ACCESS_FINE_LOCATION</span><span class="s0">,</span><span class="s1">}</span><span class="s0">, </span><span class="s2">1000</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+            <span class="s1">locationStart()</span><span class="s0">;</span>
+        <span class="s1">}</span>
+
+
+        <span class="s1">bGuardar.setOnClickListener(</span><span class="s0">new </span><span class="s1">View.OnClickListener() {</span>
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">onClick(View v) {</span>
+                <span class="s1">String datosDireccion = tDireccion.getText().toString()</span><span class="s0">;</span>
+                <span class="s1">String datosDireccion = tDireccion.getText().toString()</span><span class="s0">;</span>
+<span class="s0">,</span><span class="s2">0</span><span class="s1">uj</span>
+                <span class="s0">if</span><span class="s1">(tDireccion.length()!=</span><span class="s2">0</span><span class="s1">){</span>
+                    <span class="s1">agregar(id</span><span class="s0">,</span><span class="s1">datosDireccion)</span><span class="s0">;</span>
+                <span class="s1">}</span><span class="s0">else</span><span class="s1">{</span>
+                    <span class="s1">Toast.makeText(MenoUsuario.</span><span class="s0">this,</span><span class="s3">&quot;Ingresa algo&quot;</span><span class="s0">,</span><span class="s1">Toast.LENGTH_LONG).show()</span><span class="s0">;</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+        <span class="s1">})</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public  void </span><span class="s1">agregar(String nuevaEntrada</span><span class="s0">,</span><span class="s1">String nuevaEntrada2){</span>
+        <span class="s0">boolean </span><span class="s1">insertarData = miBD.addData(nuevaEntrada</span><span class="s0">,</span><span class="s1">nuevaEntrada2)</span><span class="s0">;</span>
+        <span class="s0">if</span><span class="s1">(insertarData == </span><span class="s0">true</span><span class="s1">) {</span>
+            <span class="s1">Toast.makeText(</span><span class="s0">this,</span><span class="s3">&quot;Datos insertados correctamente&quot;</span><span class="s0">,</span><span class="s1">Toast.LENGTH_LONG).show()</span><span class="s0">;</span>
+        <span class="s1">}</span><span class="s0">else</span><span class="s1">{</span>
+            <span class="s1">Toast.makeText(</span><span class="s0">this,</span><span class="s3">&quot;Algo salio mal&quot;</span><span class="s0">,</span><span class="s1">Toast.LENGTH_LONG).show()</span><span class="s0">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+    <span class="s0">private void </span><span class="s1">locationStart() {</span>
+        <span class="s1">LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE)</span><span class="s0">;</span>
+        <span class="s1">Localizacion Local = </span><span class="s0">new </span><span class="s1">Localizacion()</span><span class="s0">;</span>
+        <span class="s1">Local.setMenoUsuario(</span><span class="s0">this</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">final boolean </span><span class="s1">gpsEnabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)</span><span class="s0">;</span>
+        <span class="s0">if </span><span class="s1">(!gpsEnabled) {</span>
+            <span class="s1">Intent settingsIntent = </span><span class="s0">new </span><span class="s1">Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)</span><span class="s0">;</span>
+            <span class="s1">startActivity(settingsIntent)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">if </span><span class="s1">(ActivityCompat.checkSelfPermission(</span><span class="s0">this, </span><span class="s1">Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &amp;&amp; ActivityCompat.checkSelfPermission(</span><span class="s0">this, </span><span class="s1">Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {</span>
+            <span class="s1">ActivityCompat.requestPermissions(</span><span class="s0">this, new </span><span class="s1">String[]{Manifest.permission.ACCESS_FINE_LOCATION</span><span class="s0">,</span><span class="s1">}</span><span class="s0">, </span><span class="s2">1000</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s0">return;</span>
+        <span class="s1">}</span>
+        <span class="s1">mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER</span><span class="s0">, </span><span class="s2">0</span><span class="s0">, </span><span class="s2">0</span><span class="s0">, </span><span class="s1">(LocationListener) Local)</span><span class="s0">;</span>
+        <span class="s1">mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER</span><span class="s0">, </span><span class="s2">0</span><span class="s0">, </span><span class="s2">0</span><span class="s0">, </span><span class="s1">(LocationListener) Local)</span><span class="s0">;</span>
+        <span class="s1">tDireccion.setText(</span><span class="s3">&quot;Localización agregada&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">tDireccion.setText(</span><span class="s3">&quot;&quot;</span><span class="s1">)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+    <span class="s0">public void </span><span class="s1">onRequestPermissionsResult(</span><span class="s0">int </span><span class="s1">requestCode</span><span class="s0">, </span><span class="s1">String[] permissions</span><span class="s0">, int</span><span class="s1">[] grantResults) {</span>
+        <span class="s0">if </span><span class="s1">(requestCode == </span><span class="s2">1000</span><span class="s1">) {</span>
+            <span class="s0">if </span><span class="s1">(grantResults[</span><span class="s2">0</span><span class="s1">] == PackageManager.PERMISSION_GRANTED) {</span>
+                <span class="s1">locationStart()</span><span class="s0">;</span>
+                <span class="s0">return;</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+    <span class="s0">public void </span><span class="s1">setLocation(Location loc) {</span>
+        <span class="s4">//Obtener la direccion de la calle a partir de la latitud y la longitud</span>
+        <span class="s0">if </span><span class="s1">(loc.getLatitude() != </span><span class="s2">0.0 </span><span class="s1">&amp;&amp; loc.getLongitude() != </span><span class="s2">0.0</span><span class="s1">) {</span>
+            <span class="s0">try </span><span class="s1">{</span>
+                <span class="s1">Geocoder geocoder = </span><span class="s0">new </span><span class="s1">Geocoder(</span><span class="s0">this, </span><span class="s1">Locale.getDefault())</span><span class="s0">;</span>
+                <span class="s1">List&lt;Address&gt; list = geocoder.getFromLocation(</span>
+                        <span class="s1">loc.getLatitude()</span><span class="s0">, </span><span class="s1">loc.getLongitude()</span><span class="s0">, </span><span class="s2">1</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s0">if </span><span class="s1">(!list.isEmpty()) {</span>
+                    <span class="s1">Address DirCalle = list.get(</span><span class="s2">0</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">tDireccion.setText(</span><span class="s3">&quot;Mi direccion es:&quot;</span>
+                            <span class="s1">+ DirCalle.getAddressLine(</span><span class="s2">0</span><span class="s1">) + </span><span class="s3">&quot;</span><span class="s0">\n </span><span class="s3">Longitud: &quot;</span><span class="s1">+loc.getLongitude()+ </span><span class="s3">&quot;</span><span class="s0">\n </span><span class="s3">Latitud: &quot;</span><span class="s1">+loc.getLatitude())</span><span class="s0">;</span>
+                <span class="s1">}</span>
+            <span class="s1">} </span><span class="s0">catch </span><span class="s1">(IOException e) {</span>
+                <span class="s1">e.printStackTrace()</span><span class="s0">;</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+    <span class="s4">/* Aqui empieza la Clase Localizacion */</span>
+    <span class="s0">public class </span><span class="s1">Localizacion </span><span class="s0">implements </span><span class="s1">LocationListener {</span>
+       <span class="s1">MenoUsuario menoUsuario</span><span class="s0">;</span>
+        <span class="s0">public </span><span class="s1">MenoUsuario getMenoUsuario() {</span>
+            <span class="s0">return </span><span class="s1">menoUsuario</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">public void </span><span class="s1">setMenoUsuario(MenoUsuario menoUsuario) {</span>
+            <span class="s0">this</span><span class="s1">.menoUsuario = menoUsuario</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s1">@Override</span>
+        <span class="s0">public void </span><span class="s1">onLocationChanged(Location loc) {</span>
+            <span class="s4">// Este metodo se ejecuta cada vez que el GPS recibe nuevas coordenadas</span>
+            <span class="s4">// debido a la deteccion de un cambio de ubicacion</span>
+            <span class="s1">loc.getLatitude()</span><span class="s0">;</span>
+            <span class="s1">loc.getLongitude()</span><span class="s0">;</span>
+
+            <span class="s0">this</span><span class="s1">.menoUsuario.setLocation(loc)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s1">@Override</span>
+        <span class="s0">public void </span><span class="s1">onProviderDisabled(String provider) {</span>
+            <span class="s4">// Este metodo se ejecuta cuando el GPS es desactivado</span>
+            <span class="s1">tDireccion.setText(</span><span class="s3">&quot;GPS Desactivado&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s1">@Override</span>
+        <span class="s0">public void </span><span class="s1">onProviderEnabled(String provider) {</span>
+            <span class="s4">// Este metodo se ejecuta cuando el GPS es activado</span>
+            <span class="s1">tDireccion.setText(</span><span class="s3">&quot;GPS Activado&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s1">@Override</span>
+        <span class="s0">public void </span><span class="s1">onStatusChanged(String provider</span><span class="s0">, int </span><span class="s1">status</span><span class="s0">, </span><span class="s1">Bundle extras) {</span>
+            <span class="s0">switch </span><span class="s1">(status) {</span>
+                <span class="s0">case </span><span class="s1">LocationProvider.AVAILABLE:</span>
+                    <span class="s1">Log.d(</span><span class="s3">&quot;debug&quot;</span><span class="s0">, </span><span class="s3">&quot;LocationProvider.AVAILABLE&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s0">break;</span>
+                <span class="s0">case </span><span class="s1">LocationProvider.OUT_OF_SERVICE:</span>
+                    <span class="s1">Log.d(</span><span class="s3">&quot;debug&quot;</span><span class="s0">, </span><span class="s3">&quot;LocationProvider.OUT_OF_SERVICE&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s0">break;</span>
+                <span class="s0">case </span><span class="s1">LocationProvider.TEMPORARILY_UNAVAILABLE:</span>
+                    <span class="s1">Log.d(</span><span class="s3">&quot;debug&quot;</span><span class="s0">, </span><span class="s3">&quot;LocationProvider.TEMPORARILY_UNAVAILABLE&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s0">break;</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+<span class="s1">}</span></pre>
+</body>
+</html>
